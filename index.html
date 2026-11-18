@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EventHub — Laravel Event Registration Platform</title>
+  <meta name="description" content="Discover events, register easily, and streamline event management with EventHub, a modern full-stack PHP Laravel & MySQL event registration platform.">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="public/favicon.ico">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* CSS Reset & Variables */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #eff6ff;
+      --primary-border: #bfdbfe;
+      --navy-900: #0f172a;
+      --navy-800: #1e293b;
+      --slate-600: #475569;
+      --slate-500: #64748b;
+      --slate-400: #94a3b8;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+      --slate-50: #f8fafc;
+      --white: #ffffff;
+      --emerald-600: #059669;
+      --emerald-50: #ecfdf5;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--white);
+      color: var(--navy-800);
+      line-height: 1.6;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s ease;
+    }
+
+    /* Container */
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Header & Navigation */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--slate-200);
+    }
+
+    .nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--navy-900);
+      letter-spacing: -0.02em;
+    }
+
+    .logo-icon {
+      width: 38px;
+      height: 38px;
+      background: var(--primary);
+      color: var(--white);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+    }
+
+    .logo-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .logo span {
+      color: var(--primary);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-link {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--slate-600);
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover {
+      color: var(--primary);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      outline: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--white);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--white);
+      color: var(--navy-800);
+      border-color: var(--slate-200);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-secondary:hover {
+      background: var(--slate-50);
+      border-color: var(--slate-400);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--slate-600);
+      border-color: var(--slate-200);
+    }
+
+    .btn-outline:hover {
+      color: var(--primary);
+      background: var(--primary-light);
+      border-color: var(--primary-border);
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--navy-800);
+      cursor: pointer;
+      padding: 6px;
+    }
+
+    .mobile-nav {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      padding: 20px 24px 28px;
+      background: var(--white);
+      border-bottom: 1px solid var(--slate-200);
+    }
+
+    .mobile-nav.open {
+      display: flex;
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 90px 0 80px;
+      text-align: center;
+      background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+      position: relative;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid var(--primary-border);
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--primary);
+      border-radius: 50%;
+    }
+
+    .hero-title {
+      font-size: 3.25rem;
+      line-height: 1.15;
+      font-weight: 800;
+      color: var(--navy-900);
+      letter-spacing: -0.03em;
+      max-width: 840px;
+      margin: 0 auto 20px;
+    }
+
+    .hero-title span {
+      color: var(--primary);
+    }
+
+    .hero-desc {
+      font-size: 1.18rem;
+      color: var(--slate-600);
+      max-width: 680px;
+      margin: 0 auto 36px;
+      line-height: 1.6;
+    }
+
+    .hero-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .hero-stats {
+      margin-top: 60px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      padding-top: 36px;
+      border-top: 1px solid var(--slate-200);
+    }
+
+    .stat-item h3 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--navy-900);
+    }
+
+    .stat-item p {
+      font-size: 0.88rem;
+      color: var(--slate-500);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    /* Section Global */
+    .section {
+      padding: 88px 0;
+    }
+
+    .section-alt {
+      background: var(--slate-50);
+      border-top: 1px solid var(--slate-200);
+      border-bottom: 1px solid var(--slate-200);
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto 56px;
+    }
+
+    .section-tag {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .section-title {
+      font-size: 2.35rem;
+      font-weight: 800;
+      color: var(--navy-900);
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      margin-bottom: 14px;
+    }
+
+    .section-desc {
+      font-size: 1.05rem;
+      color: var(--slate-600);
+    }
+
+    /* Feature Grid */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 28px;
+    }
+
+    .feature-card {
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg);
+      padding: 32px 28px;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .feature-card:hover {
+      border-color: var(--primary-border);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-4px);
+    }
+
+    .feature-icon-wrapper {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: var(--primary-light);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .feature-icon-wrapper svg {
+      width: 26px;
+      height: 26px;
+    }
+
+    .feature-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--navy-900);
+    }
+
+    .feature-desc {
+      font-size: 0.95rem;
+      color: var(--slate-600);
+      line-height: 1.6;
+    }
+
+    /* Workflow Cards (User Experience & Admin) */
+    .workflow-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .step-item {
+      display: flex;
+      gap: 18px;
+      background: var(--white);
+      padding: 20px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--slate-200);
+      transition: all 0.2s;
+    }
+
+    .step-item:hover {
+      border-color: var(--primary);
+      transform: translateX(4px);
+    }
+
+    .step-number {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-content h4 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--navy-900);
+      margin-bottom: 4px;
+    }
+
+    .step-content p {
+      font-size: 0.9rem;
+      color: var(--slate-600);
+    }
+
+    .workflow-preview-card {
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg);
+      padding: 12px;
+      box-shadow: var(--shadow-xl);
+      overflow: hidden;
+    }
+
+    .workflow-preview-card img {
+      width: 100%;
+      height: auto;
+      border-radius: var(--radius-md);
+      display: block;
+    }
+
+    /* Technology Grid */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .tech-card {
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-md);
+      padding: 22px 16px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tech-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .tech-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+
+    .tech-card span {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--navy-900);
+    }
+
+    /* Screenshots Section */
+    .screenshots-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 28px;
+    }
+
+    .screenshot-card {
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+
+    .screenshot-card:hover {
+      border-color: var(--primary-border);
+      box-shadow: var(--shadow-xl);
+      transform: translateY(-4px);
+    }
+
+    .screenshot-img-wrapper {
+      position: relative;
+      overflow: hidden;
+      background: var(--slate-100);
+      border-bottom: 1px solid var(--slate-200);
+    }
+
+    .screenshot-img-wrapper img {
+      width: 100%;
+      height: 230px;
+      object-fit: cover;
+      object-position: top;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+
+    .screenshot-card:hover .screenshot-img-wrapper img {
+      transform: scale(1.02);
+    }
+
+    .screenshot-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+      color: var(--white);
+      font-size: 0.9rem;
+      font-weight: 600;
+      gap: 8px;
+    }
+
+    .screenshot-card:hover .screenshot-overlay {
+      opacity: 1;
+    }
+
+    .screenshot-caption {
+      padding: 18px 20px;
+    }
+
+    .screenshot-caption h4 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--navy-900);
+      margin-bottom: 4px;
+    }
+
+    .screenshot-caption p {
+      font-size: 0.88rem;
+      color: var(--slate-500);
+    }
+
+    /* Lightbox Modal */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .lightbox.active {
+      display: flex;
+    }
+
+    .lightbox-content {
+      position: relative;
+      max-width: 1080px;
+      width: 100%;
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-xl);
+    }
+
+    .lightbox-img {
+      width: 100%;
+      max-height: 75vh;
+      object-fit: contain;
+      display: block;
+      background: #000;
+    }
+
+    .lightbox-footer {
+      padding: 16px 24px;
+      background: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .lightbox-title {
+      font-size: 1.1rem;
+      font-weight: 750;
+      color: var(--navy-900);
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(15, 23, 42, 0.7);
+      color: var(--white);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      z-index: 10;
+    }
+
+    .lightbox-close:hover {
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    /* Live App Info Modal */
+    .app-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .app-modal.active {
+      display: flex;
+    }
+
+    .app-modal-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      max-width: 540px;
+      width: 100%;
+      padding: 32px;
+      box-shadow: var(--shadow-xl);
+      text-align: center;
+    }
+
+    .app-modal-icon {
+      width: 56px;
+      height: 56px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .app-modal-icon svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .app-modal-title {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: var(--navy-900);
+      margin-bottom: 12px;
+    }
+
+    .app-modal-desc {
+      font-size: 0.96rem;
+      color: var(--slate-600);
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .app-modal-box {
+      background: var(--slate-50);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: var(--navy-800);
+      text-align: left;
+      margin-bottom: 24px;
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--white);
+      border-top: 1px solid var(--slate-200);
+      padding: 56px 0 36px;
+      margin-top: auto;
+    }
+
+    .footer-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding-bottom: 36px;
+      border-bottom: 1px solid var(--slate-200);
+      flex-wrap: wrap;
+    }
+
+    .footer-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-top: 24px;
+      font-size: 0.88rem;
+      color: var(--slate-500);
+      flex-wrap: wrap;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .workflow-container {
+        grid-template-columns: 1fr;
+      }
+      .hero-title {
+        font-size: 2.5rem;
+      }
+      .nav-links, .nav-actions .btn-secondary {
+        display: none;
+      }
+      .mobile-menu-btn {
+        display: block;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero {
+        padding: 60px 0 50px;
+      }
+      .hero-title {
+        font-size: 2.1rem;
+      }
+      .hero-desc {
+        font-size: 1rem;
+      }
+      .hero-stats {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      .section {
+        padding: 60px 0;
+      }
+      .section-title {
+        font-size: 1.85rem;
+      }
+      .screenshots-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Sticky Navigation Bar -->
+  <header class="header">
+    <div class="container nav-container">
+      
+      <!-- Brand Logo -->
+      <a href="#home" class="logo">
+        <div class="logo-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+        <span>Event</span>Hub
+      </a>
+
+      <!-- Desktop Navigation Links -->
+      <ul class="nav-links">
+        <li><a href="#home" class="nav-link">Home</a></li>
+        <li><a href="#features" class="nav-link">Features</a></li>
+        <li><a href="#user-experience" class="nav-link">User Experience</a></li>
+        <li><a href="#admin" class="nav-link">Admin</a></li>
+        <li><a href="#technology" class="nav-link">Technology</a></li>
+        <li><a href="#screenshots" class="nav-link">Screenshots</a></li>
+      </ul>
+
+      <!-- Action Buttons (Right) -->
+      <div class="nav-actions">
+        <a href="https://github.com/Justin-Saji/Event_Hub-PHP-Laravel-Project" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          GitHub
+        </a>
+
+        <button type="button" class="btn btn-primary open-live-app-btn">
+          <span>Open Live Website</span>
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+          </svg>
+        </button>
+
+        <button type="button" class="mobile-menu-btn" id="mobile-toggle" aria-label="Toggle navigation">
+          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div class="mobile-nav" id="mobile-nav">
+      <a href="#home" class="nav-link">Home</a>
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#user-experience" class="nav-link">User Experience</a>
+      <a href="#admin" class="nav-link">Admin</a>
+      <a href="#technology" class="nav-link">Technology</a>
+      <a href="#screenshots" class="nav-link">Screenshots</a>
+      <a href="https://github.com/Justin-Saji/Event_Hub-PHP-Laravel-Project" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">View GitHub Repository</a>
+      <button type="button" class="btn btn-primary open-live-app-btn" style="width: 100%;">Open Live Website</button>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="home" class="hero">
+    <div class="container">
+      <div class="badge-pill">
+        <span class="badge-dot"></span>
+        Built with PHP Laravel 11 &amp; MySQL
+      </div>
+
+      <h1 class="hero-title">
+        Discover Events. Register Easily. <span>Stay Connected.</span>
+      </h1>
+
+      <p class="hero-desc">
+        EventHub is a modern event registration platform designed to simplify event discovery, attendee registration and administrative management.
+      </p>
+
+      <div class="hero-buttons">
+        <a href="#features" class="btn btn-secondary" style="padding: 13px 28px; font-size: 1rem;">
+          Explore Features
+        </a>
+        <button type="button" class="btn btn-primary open-live-app-btn" style="padding: 13px 28px; font-size: 1rem;">
+          <span>Open Live Website</span>
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Live Project Metric Highlights -->
+      <div class="hero-stats">
+        <div class="stat-item">
+          <h3>100%</h3>
+          <p>Instant Confirmation</p>
+        </div>
+        <div class="stat-item">
+          <h3>Bcrypt</h3>
+          <p>Secure Authentication</p>
+        </div>
+        <div class="stat-item">
+          <h3>Full CRUD</h3>
+          <p>Admin Control</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="section section-alt">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Core Capabilities</span>
+        <h2 class="section-title">Designed for Attendees &amp; Organizers</h2>
+        <p class="section-desc">Everything needed to list summits, manage attendee registrations, and protect administrative records with enterprise-grade security.</p>
+      </div>
+
+      <div class="feature-grid">
+        
+        <!-- Feature 1: Upcoming Events -->
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+          <h3 class="feature-title">Upcoming Events</h3>
+          <p class="feature-desc">Dynamic MySQL-backed catalog showcasing upcoming conferences, dates, and descriptions with automatic filtering of past events.</p>
+        </div>
+
+        <!-- Feature 2: User Signup & Login -->
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+            </svg>
+          </div>
+          <h3 class="feature-title">User Signup and Login</h3>
+          <p class="feature-desc">Complete user registration system with email uniqueness validation, Bcrypt password hashing, session regeneration, and role separation.</p>
+        </div>
+
+        <!-- Feature 3: Easy Event Registration -->
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+          </div>
+          <h3 class="feature-title">Easy Event Registration</h3>
+          <p class="feature-desc">Intuitive booking form that automatically populates attendee name and email for authenticated users with CSRF protection and validation.</p>
+        </div>
+
+        <!-- Feature 4: Registration Confirmation -->
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h3 class="feature-title">Registration Confirmation</h3>
+          <p class="feature-desc">Instant confirmation pass featuring unique registration reference IDs, attendee information, event date badge, and printable verification.</p>
+        </div>
+
+        <!-- Feature 5: Admin Dashboard -->
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+            </svg>
+          </div>
+          <h3 class="feature-title">Admin Dashboard</h3>
+          <p class="feature-desc">Restricted management portal protected by authorization middleware displaying live summary metrics: Total Registrations, Active Events, and Today's Bookings.</p>
+        </div>
+
+        <!-- Feature 6: Registration Management -->
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+            </svg>
+          </div>
+          <h3 class="feature-title">Registration Management</h3>
+          <p class="feature-desc">Comprehensive data management with instant attendee search, event dropdown filters, detailed modal inspection, and safe deletion with confirmation.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- User Experience Section -->
+  <section id="user-experience" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Attendee Journey</span>
+        <h2 class="section-title">Seamless User Experience</h2>
+        <p class="section-desc">From exploring upcoming summits to managing booked event passes in a personalized account hub.</p>
+      </div>
+
+      <div class="workflow-container">
+        
+        <div class="step-list">
+          
+          <div class="step-item">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h4>Public Event Browsing</h4>
+              <p>Visitors can instantly search and browse upcoming industry summits, conferences, and workshops with real-time date sorting and live keyword search.</p>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h4>User Account Creation</h4>
+              <p>Simple registration workflow validating name, unique email address, and strong password. Privilege escalation is blocked at the database level.</p>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h4>Secure Authentication &amp; Sessions</h4>
+              <p>Stateful login with session fixation protection, CSRF token verification, and automated redirection to previous booking intent.</p>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <h4>Personal Account Management</h4>
+              <p>Attendees access a dedicated "My Account" profile page showing personal contact records and full history of booked event passes.</p>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-number">5</div>
+            <div class="step-content">
+              <h4>Instant Event Registration</h4>
+              <p>One-click attendance booking where authenticated details are automatically populated, generating an instant confirmation ticket.</p>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="workflow-preview-card">
+          <img src="docs/screenshots/event-registration.png" alt="Event Registration Interface Preview">
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Admin Section -->
+  <section id="admin" class="section section-alt">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Back-Office Control</span>
+        <h2 class="section-title">Powerful Administrative System</h2>
+        <p class="section-desc">An isolated administrative operations center equipped with live metrics, data management, and strict access controls.</p>
+      </div>
+
+      <div class="workflow-container">
+        
+        <div class="workflow-preview-card">
+          <img src="docs/screenshots/admin-dashboard.png" alt="Admin Dashboard Overview">
+        </div>
+
+        <div class="step-list">
+          
+          <div class="step-item">
+            <div class="step-number">A</div>
+            <div class="step-content">
+              <h4>Secure Administrator Login</h4>
+              <p>Dedicated admin gateway validating <code>is_admin = true</code> authorization middleware. Unauthorized attempts are strictly repelled.</p>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-number">B</div>
+            <div class="step-content">
+              <h4>Dashboard Analytics</h4>
+              <p>Live calculated counters directly queried from MySQL highlighting Total Registrations, Total Active Events, and Today's Registrations.</p>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-number">C</div>
+            <div class="step-content">
+              <h4>Search &amp; Event Filtering</h4>
+              <p>Fast keyword search across participant names and emails, coupled with real-time dropdown filters by individual event.</p>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-number">D</div>
+            <div class="step-content">
+              <h4>View &amp; Delete Management</h4>
+              <p>Inspect comprehensive attendee profiles, timestamps, and booked summits with safe deletion actions and confirmation dialogs.</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Technology Section -->
+  <section id="technology" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Architecture</span>
+        <h2 class="section-title">Built with Modern Web Technologies</h2>
+        <p class="section-desc">Engineered following Laravel best practices, clean MVC separation, and modern responsive styling.</p>
+      </div>
+
+      <div class="tech-grid">
+        
+        <div class="tech-card">
+          <div class="tech-badge" style="background: #eef2ff; color: #4f46e5;">PHP</div>
+          <span>PHP 8.3+</span>
+        </div>
+
+        <div class="tech-card">
+          <div class="tech-badge" style="background: #fef2f2; color: #ef4444;">LV</div>
+          <span>Laravel 11</span>
+        </div>
+
+        <div class="tech-card">
+          <div class="tech-badge" style="background: #eff6ff; color: #0284c7;">SQL</div>
+          <span>MySQL / MariaDB</span>
+        </div>
+
+        <div class="tech-card">
+          <div class="tech-badge" style="background: #fff7ed; color: #ea580c;">H5</div>
+          <span>HTML5</span>
+        </div>
+
+        <div class="tech-card">
+          <div class="tech-badge" style="background: #f0fdf4; color: #16a34a;">CSS</div>
+          <span>CSS3</span>
+        </div>
+
+        <div class="tech-card">
+          <div class="tech-badge" style="background: #fefce8; color: #ca8a04;">JS</div>
+          <span>JavaScript</span>
+        </div>
+
+        <div class="tech-card">
+          <div class="tech-badge" style="background: #faf5ff; color: #9333ea;">VT</div>
+          <span>Vite 6</span>
+        </div>
+
+        <div class="tech-card">
+          <div class="tech-badge" style="background: #ecfeff; color: #0891b2;">TW</div>
+          <span>Tailwind CSS</span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Screenshots Section -->
+  <section id="screenshots" class="section section-alt">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Visual Walkthrough</span>
+        <h2 class="section-title">Application Screenshots</h2>
+        <p class="section-desc">Click any preview below to inspect high-resolution captures of the actual running application.</p>
+      </div>
+
+      <div class="screenshots-grid">
+        
+        <!-- Screenshot 1: Public Homepage -->
+        <div class="screenshot-card" onclick="openLightbox('docs/screenshots/public-homepage.png', 'Public Homepage — Event Catalog & Hero')">
+          <div class="screenshot-img-wrapper">
+            <img src="docs/screenshots/public-homepage.png" alt="Public Homepage">
+            <div class="screenshot-overlay">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+              </svg>
+              Click to Enlarge
+            </div>
+          </div>
+          <div class="screenshot-caption">
+            <h4>Public Homepage</h4>
+            <p>Hero banner, event metrics, search filter, and responsive event cards.</p>
+          </div>
+        </div>
+
+        <!-- Screenshot 2: User Signup -->
+        <div class="screenshot-card" onclick="openLightbox('docs/screenshots/user-signup.png', 'User Signup — Account Registration')">
+          <div class="screenshot-img-wrapper">
+            <img src="docs/screenshots/user-signup.png" alt="User Signup">
+            <div class="screenshot-overlay">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+              </svg>
+              Click to Enlarge
+            </div>
+          </div>
+          <div class="screenshot-caption">
+            <h4>User Signup</h4>
+            <p>Account creation with validation, CSRF token, and password security.</p>
+          </div>
+        </div>
+
+        <!-- Screenshot 3: User Login -->
+        <div class="screenshot-card" onclick="openLightbox('docs/screenshots/user-login.png', 'User Login — Secure Authentication')">
+          <div class="screenshot-img-wrapper">
+            <img src="docs/screenshots/user-login.png" alt="User Login">
+            <div class="screenshot-overlay">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+              </svg>
+              Click to Enlarge
+            </div>
+          </div>
+          <div class="screenshot-caption">
+            <h4>User Login</h4>
+            <p>Session-based authentication with credential validation and generic error alerts.</p>
+          </div>
+        </div>
+
+        <!-- Screenshot 4: Event Registration -->
+        <div class="screenshot-card" onclick="openLightbox('docs/screenshots/event-registration.png', 'Event Registration — Instant Booking')">
+          <div class="screenshot-img-wrapper">
+            <img src="docs/screenshots/event-registration.png" alt="Event Registration">
+            <div class="screenshot-overlay">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+              </svg>
+              Click to Enlarge
+            </div>
+          </div>
+          <div class="screenshot-caption">
+            <h4>Event Registration</h4>
+            <p>Pre-populated attendee form with event details and duplicate protection.</p>
+          </div>
+        </div>
+
+        <!-- Screenshot 5: Registration Success Pass -->
+        <div class="screenshot-card" onclick="openLightbox('docs/screenshots/registration-success.png', 'Registration Success — Attendee Pass')">
+          <div class="screenshot-img-wrapper">
+            <img src="docs/screenshots/registration-success.png" alt="Registration Success Pass">
+            <div class="screenshot-overlay">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+              </svg>
+              Click to Enlarge
+            </div>
+          </div>
+          <div class="screenshot-caption">
+            <h4>Registration Success</h4>
+            <p>Attendee verification pass displaying reference ID and event dates.</p>
+          </div>
+        </div>
+
+        <!-- Screenshot 6: Admin Dashboard -->
+        <div class="screenshot-card" onclick="openLightbox('docs/screenshots/admin-dashboard.png', 'Admin Dashboard — Analytics Overview')">
+          <div class="screenshot-img-wrapper">
+            <img src="docs/screenshots/admin-dashboard.png" alt="Admin Dashboard">
+            <div class="screenshot-overlay">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+              </svg>
+              Click to Enlarge
+            </div>
+          </div>
+          <div class="screenshot-caption">
+            <h4>Admin Dashboard</h4>
+            <p>Summary metric cards, dark theme sidebar navigation, and quick links.</p>
+          </div>
+        </div>
+
+        <!-- Screenshot 7: Registration Management -->
+        <div class="screenshot-card" onclick="openLightbox('docs/screenshots/admin-registrations.png', 'Admin Portal — Registration Management')">
+          <div class="screenshot-img-wrapper">
+            <img src="docs/screenshots/admin-registrations.png" alt="Registration Management Table">
+            <div class="screenshot-overlay">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+              </svg>
+              Click to Enlarge
+            </div>
+          </div>
+          <div class="screenshot-caption">
+            <h4>Registration Management</h4>
+            <p>Paginated registrations table with search, event filters, view and delete.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Lightbox Modal for Screenshots -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+    <div class="lightbox-content" onclick="event.stopPropagation()">
+      <button class="lightbox-close" onclick="closeLightbox(event)" aria-label="Close lightbox">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+      <img id="lightbox-img" class="lightbox-img" src="" alt="Screenshot Enlarge View">
+      <div class="lightbox-footer">
+        <h4 id="lightbox-title" class="lightbox-title">Screenshot Preview</h4>
+        <button class="btn btn-secondary" onclick="closeLightbox(event)">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Application Link Modal -->
+  <div class="app-modal" id="app-modal" onclick="closeAppModal(event)">
+    <div class="app-modal-card" onclick="event.stopPropagation()">
+      <div class="app-modal-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"></path>
+        </svg>
+      </div>
+      <h3 class="app-modal-title">Live Backend Application</h3>
+      <p class="app-modal-desc">
+        The EventHub backend runs on <strong>PHP Laravel &amp; MySQL</strong>, requiring a PHP runtime environment. GitHub Pages hosts static web pages.
+      </p>
+      <div class="app-modal-box">
+        <div><strong>Local Development URL:</strong> http://127.0.0.1:8000</div>
+        <div style="margin-top: 6px;"><strong>Production Deployment:</strong> Ready to deploy to Railway, Render, Fly.io, or VPS</div>
+      </div>
+      <p class="app-modal-desc" style="font-size: 0.88rem; margin-bottom: 20px;">
+        To link your hosted live URL, update the <code>LIVE_APP_URL</code> configuration variable at the top of <code>index.html</code>.
+      </p>
+      <div style="display: flex; gap: 12px; justify-content: center;">
+        <a href="https://github.com/Justin-Saji/Event_Hub-PHP-Laravel-Project" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+          View on GitHub
+        </a>
+        <button type="button" class="btn btn-secondary" onclick="closeAppModal(event)">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="logo">
+            <div class="logo-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+            <span>Event</span>Hub
+          </div>
+          <p style="font-size: 0.9rem; color: var(--slate-500); margin-top: 4px;">Modern Event Registration Platform</p>
+        </div>
+
+        <div style="display: flex; gap: 20px; align-items: center;">
+          <a href="#home" class="nav-link">Home</a>
+          <a href="#features" class="nav-link">Features</a>
+          <a href="#user-experience" class="nav-link">User Experience</a>
+          <a href="#admin" class="nav-link">Admin</a>
+          <a href="#technology" class="nav-link">Technology</a>
+          <a href="https://github.com/Justin-Saji/Event_Hub-PHP-Laravel-Project" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+            GitHub
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>&copy; 2026 EventHub. Developed by Justin Saji. All rights reserved.</div>
+        <div>Built with PHP Laravel, MySQL, Vite &amp; Tailwind CSS</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Interactivity Script -->
+  <script>
+    // =========================================================================
+    // LIVE APPLICATION CONFIGURATION
+    // Set your production hosted Laravel application URL below once deployed:
+    // Example: const LIVE_APP_URL = "https://eventhub.railway.app";
+    // If empty (""), clicking "Open Live Website" shows the deployment info dialog.
+    // =========================================================================
+    const LIVE_APP_URL = "";
+
+    // Mobile Menu Toggle
+    const mobileToggle = document.getElementById('mobile-toggle');
+    const mobileNav = document.getElementById('mobile-nav');
+    if (mobileToggle && mobileNav) {
+      mobileToggle.addEventListener('click', () => {
+        mobileNav.classList.toggle('open');
+      });
+      mobileNav.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          mobileNav.classList.remove('open');
+        });
+      });
+    }
+
+    // Live App Button Handlers
+    document.querySelectorAll('.open-live-app-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (LIVE_APP_URL && LIVE_APP_URL.trim() !== "") {
+          window.open(LIVE_APP_URL, '_blank', 'noopener,noreferrer');
+        } else {
+          openAppModal();
+        }
+      });
+    });
+
+    // Lightbox Modal for Screenshots
+    function openLightbox(src, title) {
+      const lb = document.getElementById('lightbox');
+      const img = document.getElementById('lightbox-img');
+      const caption = document.getElementById('lightbox-title');
+      if (lb && img && caption) {
+        img.src = src;
+        caption.textContent = title;
+        lb.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeLightbox(e) {
+      const lb = document.getElementById('lightbox');
+      if (lb) {
+        lb.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    }
+
+    // App Info Modal
+    function openAppModal() {
+      const modal = document.getElementById('app-modal');
+      if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeAppModal(e) {
+      const modal = document.getElementById('app-modal');
+      if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    }
+
+    // Close on Escape Key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeLightbox();
+        closeAppModal();
+      }
+    });
+  </script>
+
+</body>
+</html>
